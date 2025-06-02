@@ -1,0 +1,31 @@
+import os
+from building import *
+import rtconfig
+
+cwd = GetCurrentDir()
+
+src = ['src/gtest-all.cc']
+src += ['src/gtest_main.cc']
+
+path = [cwd]
+path += [cwd + '/include']
+path += [cwd + '/src']
+
+LOCAL_CCFLAGS = '-std=c++17'
+CPPDEFINES = [
+    {'GTEST_OS_RTTHREAD': 1}, # 用于 gtest_main.cc 中判断当前系统
+    {'GTEST_HAS_POSIX_RE': 0}, # 必须有，且设置为0
+    {'GTEST_HAS_STREAM_REDIRECTION': 0}, # 必须有，且设置为0
+    # 以下几个设置为0，可以减少代码体积:
+    {'GTEST_HAS_CLONE': 0},
+    {'GTEST_HAS_EXCEPTIONS': 0}, # 设置为0后，就不需要启用RT-Thread的异常处理了，可以减少代码体积
+    {'GTEST_HAS_RTTI': 0},
+    {'GTEST_HAS_PTHREAD': 0},
+    {'GTEST_HAS_STD_WSTRING': 0},
+    {'GTEST_HAS_FILE_SYSTEM': 0},
+    {'GTEST_HAS_SEH': 0},
+]
+
+objs = DefineGroup('googletest', src, depend = ['RT_USING_GTEST'], CPPPATH = path, LOCAL_CCFLAGS = LOCAL_CCFLAGS, CPPDEFINES = CPPDEFINES)
+
+Return('objs')
